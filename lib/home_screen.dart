@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,18 +13,19 @@ class myhome extends StatefulWidget {
 class _myhomeState extends State<myhome> {
   Map<String, dynamic>? dataMap;
   Map<String, dynamic>? donedataMap;
+  List<dynamic>?donelistdata;
 
   Future hitapi() async {
   try {
-    final response = await http.get(Uri.parse("https://reqres.in/api/users/2"));
+    final response = await http.get(Uri.parse("https://reqres.in/api/users?page=2"));
     
     if (!mounted) return;
 
     if (response.statusCode == 200) {
       setState(() {
         dataMap = jsonDecode(response.body);
-        donedataMap = dataMap!["data"];
-        print(donedataMap);
+        donelistdata = dataMap!["data"];
+        print(donelistdata);
       });
     } else {
       print("Error: Status code ${response.statusCode}");
@@ -48,15 +50,18 @@ class _myhomeState extends State<myhome> {
         title: Text("Get API"),
       ),
       body: Center(
-        child: donedataMap == null
-            ? CircularProgressIndicator():
-               ListTile(title:
-                 Text( donedataMap!["first_name"].toString()+"  "+
-                 donedataMap!["last_name"].toString(),
-                              ),
-              subtitle: Text(  donedataMap!["email"].toString(),),
-              ),
-            
+        child:donelistdata==null?CupertinoActivityIndicator():
+         ListView.builder(
+          itemCount: donelistdata!.length,
+          itemBuilder: (context,index){
+          return ListTile(leading: CircleAvatar(backgroundImage:NetworkImage(donelistdata![index]["avatar"].toString()),),
+            title: Text(donelistdata![index]["first_name"].toString()+""+
+            donelistdata![index]["last_name"].toString(),
+            ),
+            subtitle: Text(donelistdata![index]["email"].toString()),
+          );
+        }),
+      
             
       ),
     );
