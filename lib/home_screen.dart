@@ -11,59 +11,63 @@ class myhome extends StatefulWidget {
 }
 
 class _myhomeState extends State<myhome> {
-  Map<String, dynamic>? dataMap;
-  Map<String, dynamic>? donedataMap;
-  List<dynamic>?donelistdata;
+  List<dynamic>? donelistdata;
 
   Future hitapi() async {
-  try {
-    final response = await http.get(Uri.parse("https://reqres.in/api/users?page=2"));
-    
-    if (!mounted) return;
+    try {
+      final response = await http.get(
+        Uri.parse("https://reqres.in/api/users?page=2"),
+      );
 
-    if (response.statusCode == 200) {
-      setState(() {
-        dataMap = jsonDecode(response.body);
-        donelistdata = dataMap!["data"];
-        print(donelistdata);
-      });
-    } else {
-      print("Error: Status code ${response.statusCode}");
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        setState(() {
+          donelistdata = decoded["data"];
+        });
+
+      debugPrint(donelistdata.toString(), wrapWidth: 2048);
+      }
+    } catch (e) {
+      print(e);
     }
-  } catch (e) {
-    print("Exception: $e");
   }
-}
 
   @override
   void initState() {
     super.initState();
-    hitapi();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      hitapi();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("Get API"),
         centerTitle: true,
         backgroundColor: Colors.blue,
-        title: Text("Get API"),
       ),
-      body: Center(
-        child:donelistdata==null?CupertinoActivityIndicator():
-         ListView.builder(
-          itemCount: donelistdata!.length,
-          itemBuilder: (context,index){
-          return ListTile(leading: CircleAvatar(backgroundImage:NetworkImage(donelistdata![index]["avatar"].toString()),),
-            title: Text(donelistdata![index]["first_name"].toString()+""+
-            donelistdata![index]["last_name"].toString(),
-            ),
-            subtitle: Text(donelistdata![index]["email"].toString()),
-          );
-        }),
+      body: 
+        donelistdata == null
+            ? CupertinoActivityIndicator()
+            : ListView.builder(
+                itemCount: donelistdata!.length,
+                itemBuilder: (context, index) {
+                  final user = donelistdata![index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(user["avatar"]),
+                    ),
+                    title: Text("${user["first_name"]} ${user["last_name"]}"),
+                    subtitle: Text(user["email"]),
+                  );
+                },
+              ),
       
-            
-      ),
     );
   }
 }
