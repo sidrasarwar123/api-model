@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/login_controller.dart';
 import 'package:flutter_application_1/home_screen.dart';
-import 'package:flutter_application_1/login_screen.dart';
+import 'package:flutter_application_1/login_screen.dart' hide LoginController;
 import 'package:provider/provider.dart';
 
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
        
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginScreen(),
+      home:LoginScreen() 
     ) 
     
     
